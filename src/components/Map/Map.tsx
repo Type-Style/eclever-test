@@ -1,36 +1,47 @@
-import "mapbox-gl/dist/mapbox-gl.css";
-import { useState } from "react";
+import React from 'react'
+import Map, { Marker } from 'react-map-gl/mapbox';
+import useApi from '../../hooks/useApi';
 
-import ReactMapGL, { Marker } from "react-mapbox-gl";
+const TOKEN = "pk.eyJ1IjoiZWNsZXZlciIsImEiOiJja3IzM3B3b24yMHNsMnBueGNya3I4eXExIn0.qNBd6dRRZLTTxKSJ0PUazg" // TODO, realworld => move to env
 
 const GERMANY_BOUNDS: [[number, number], [number, number]] = [
   [3, 40],
   [16, 56]
 ];
 
-const ReactMapboxGl = ReactMapGL({} as any);
+export default function Map_new() {
+  const { citiesData, citiesError } = useApi();
 
+  if (citiesError) {
+    return <p>{citiesError.message}</p>;
+  }
 
-const Map = ({
-  children
-}: {
-  children?: JSX.Element | JSX.Element[] | Array<JSX.Element | undefined>;
-}) => {
-  
   return (
-    <ReactMapboxGl
-      style="mapbox://styles/mapbox/streets-v11"
-      // fitBounds={GERMANY_BOUNDS}
-      center={[-122.4376, 37.7577]}
-      zoom={[8]}
-      containerStyle={{ width: "100%", height: "100%" }}
+    <Map
+      initialViewState={{
+        bounds: GERMANY_BOUNDS
+      }}
+      mapStyle="mapbox://styles/mapbox/streets-v11"
+      mapboxAccessToken={TOKEN}
     >
-      <Marker coordinates={[-122.4376, 37.7577]}>
-        <div style={{ zIndex:"99999", background: "lime", width: "20px", height: "20px", color: "red", border: "5px dotted red" }}>HELLO</div>
-      </Marker>
-    </ReactMapboxGl>
+      {citiesData && citiesData.map((city, index) => {
+        console.log(city[0].latlng);
+       return  (
+        <Marker
+          key={`marker-${index}`}
+          latitude={city[0].capitalInfo.latlng[0]}
+          longitude={city[0].capitalInfo.latlng[1]}
+          anchor="center"
+          onClick={e => {
+            // If we let the click event propagates to the map, it will immediately close the popup
+            // with `closeOnClick: true`
+            e.originalEvent.stopPropagation();
+          }}
+        >
+          <div style={{ background: "lime", width: "32px", height: "32px", color: "red", border: "2px solid black" }}></div>
+
+        </Marker>
+      )})}
+    </Map>
   )
-
 }
-
-export default Map;
