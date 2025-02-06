@@ -69,7 +69,7 @@ export default function Map_component() {
           <div>
             <h1>{popupInfo.name}</h1>
             <label> Set Color: <br/>
-              <input
+              <input style={{padding: 0, background: "transparent", border: 0, aspectRatio: 1, width: "32px"}}
                 type="color"
                 value={markerColors[popupInfo.name] || "rgba(0,0,0,0.2)"}
                 onChange={(e) => {
